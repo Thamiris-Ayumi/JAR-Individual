@@ -5,13 +5,15 @@
 package conexao.JDBC;
 
 import com.github.britooo.looca.api.group.processador.Processador;
+import com.slack.api.methods.SlackApiException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamiris
+ * @author rafae
  */
 public class ColetaProcessador {
 
@@ -24,10 +26,14 @@ public class ColetaProcessador {
     private String tipoComponente;
     private String modeloComponente;
     private Processador processador;
+    private String idAlerta;
+    private String statusAlerta;
+    private Double porcentagem;
 
     public ColetaProcessador() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         processador = new Processador();
+//        this.capacidade = processador.getNumeroCpusFisicas().doubleValue()+processador.getNumeroCpusLogicas().doubleValue();
         this.idMetrica = null;
         this.capacidade = ((processador.getFrequencia().doubleValue()) / 1000000000) * (processador.getNumeroCpusFisicas() + processador.getNumeroCpusLogicas());
         this.valorUtilizado = processador.getUso();
@@ -35,20 +41,25 @@ public class ColetaProcessador {
         this.dataHora = LocalDateTime.now().format(formatter);
         this.tipoComponente = "Processador";
         this.modeloComponente = processador.getNome();
+
     }
 
 //  Para enviar à entidade Configuração Componente:
-        public JdbcTemplate conectHd() {
+    public JdbcTemplate conectHd() {
         JdbcTemplate conection = new Conexao().getConnection();
         return conection;
     }
-        public JdbcTemplate conectHdAzu() {
+
+    public JdbcTemplate conectHdAzu() {
         JdbcTemplate conection = new Conexao().getConnectionAzu();
         return conection;
     }
-     public void enviaDadosProcessador(Integer fkMaquina, Integer fkEmpresa) {
+
+    public void enviaDadosProcessador(Integer fkMaquina, Integer fkEmpresa) throws SlackApiException, IOException {
         ColetaProcessador coleta = new ColetaProcessador();
-        
+
+        // Alertas aqui
+        // Envio de dados aqui         
         this.conectHd().update("insert into Metrica values(?,?,?,?,?,?,?)",
                 coleta.idMetrica = null,
                 coleta.valorUtilizado,
@@ -58,26 +69,47 @@ public class ColetaProcessador {
                 fkEmpresa,
                 2);
         this.conectHdAzu().update("insert into Metrica(valorUtilizado,unidadeMedida,dataHora,fkMaquina,fkEmpresa,fkComponente) values(?,?,?,?,?,?)",
-                
                 coleta.valorUtilizado,
                 coleta.unidadeMedida,
                 coleta.dataHora,
                 fkMaquina,
                 fkEmpresa,
                 2);
-     }
-     public void enviaDadosProcessadorazu(Integer fkMaquina, Integer fkEmpresa) {
+
+        porcentagem = ((coleta.valorUtilizado / coleta.capacidade) * 100);
+        if (porcentagem < 80) {
+            statusAlerta = "Ideal";
+        } else if (porcentagem >= 80 && porcentagem < 90) {
+            statusAlerta = "Atencao";
+        } else if (porcentagem >= 90 && porcentagem < 100) {
+            statusAlerta = "Alerta";
+        }
+        this.conectHd().update("insert into AlertaDashboard values(?,?,?,?,?)",
+                idAlerta = null,
+                coleta.dataHora,
+                statusAlerta,
+                2,
+                fkMaquina);
+        this.conectHdAzu().update("insert into AlertaDashboard values(?,?,?,?)",
+                coleta.dataHora,
+                statusAlerta,
+                2,
+                fkMaquina);
+
+    }
+
+    public void enviaDadosProcessadorazu(Integer fkMaquina, Integer fkEmpresa) {
         ColetaProcessador coleta = new ColetaProcessador();
-        
+
         this.conectHdAzu().update("insert into Metrica(valorUtilizado,unidadeMedida,dataHora,fkMaquina,fkEmpresa,fkComponente) values(?,?,?,?,?,?)",
-                
                 coleta.valorUtilizado,
                 coleta.unidadeMedida,
                 coleta.dataHora,
                 fkMaquina,
                 fkEmpresa,
                 2);
-     }
+    }
+
     public Double getCapacidade() {
         return capacidade;
     }

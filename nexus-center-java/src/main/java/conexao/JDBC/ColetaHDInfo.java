@@ -8,6 +8,8 @@ import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.discos.Volume;
+import com.slack.api.methods.SlackApiException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,6 +36,9 @@ public class ColetaHDInfo {
     private DiscoGrupo grupoDeDiscos;
     private Double bytesEscritos;
     private Double capacidadeocupada;
+    private String idAlerta;
+    private String statusAlerta;
+    private Double porcentagem;
 
     public ColetaHDInfo() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -50,11 +55,12 @@ public class ColetaHDInfo {
         List<Volume> listavolumed = grupoDeDiscos.getVolumes();
         for (Volume volume : listavolumed) {
             capacidadeocupada += volume.getDisponivel();
+
         }
 
         this.idMetrica = null;
-        this.capacidade = grupoDeDiscos.getTamanhoTotal().doubleValue() / 1000000000;
-        this.valorUtilizado = this.capacidade - (capacidadeocupada / 1000000000);
+        this.capacidade = grupoDeDiscos.getTamanhoTotal().doubleValue() / (1024 * 1024 * 1024);
+        this.valorUtilizado = this.capacidade - (capacidadeocupada / (1024 * 1024 * 1024));
         this.unidadeMedida = "GB";
         this.dataHora = LocalDateTime.now().format(formatter);
         this.tipoComponente = "HDTotal";
@@ -81,7 +87,7 @@ public class ColetaHDInfo {
         return conection;
     }
 
-    public void enviaDadosTotalhd(Integer fkMaquina, Integer fkEmpresa) {
+    public void enviaDadosTotalhd(Integer fkMaquina, Integer fkEmpresa) throws SlackApiException, IOException {
         ColetaHDInfo coleta = new ColetaHDInfo();
 
         this.conectHd().update("insert into Metrica values(?,?,?,?,?,?,?)",
@@ -99,10 +105,31 @@ public class ColetaHDInfo {
                 fkMaquina,
                 fkEmpresa.toString(),
                 1);
+        porcentagem = ((coleta.valorUtilizado / coleta.capacidade) * 100);
+        if (porcentagem < 80) {
+            statusAlerta = "Ideal";
+        } else if (porcentagem >= 80 && porcentagem < 90) {
+            statusAlerta = "Atencao";
+        } else if (porcentagem >= 90 && porcentagem < 100) {
+            statusAlerta = "Alerta";
+        }
+        this.conectHd().update("insert into AlertaDashboard values(?,?,?,?,?)",
+                idAlerta = null,
+                coleta.dataHora,
+                statusAlerta,
+                1,
+                fkMaquina);
+        this.conectHdazu().update("insert into AlertaDashboard values(?,?,?,?)",
+                coleta.dataHora,
+                statusAlerta,
+                1,
+                fkMaquina);
+
     }
 
     public void enviaDadosTotalhdazu(Integer fkMaquina, Integer fkEmpresa) {
         ColetaHDInfo coleta = new ColetaHDInfo();
+
     }
 
     public void enviadadosporHD() {
@@ -113,7 +140,7 @@ public class ColetaHDInfo {
         bytesEscritos = 0.0;
         capacidadeocupada = 0.0;
         dataHora = LocalDateTime.now().format(formatter);
-
+//      Foi nescessário criar duas listas para prosseguir com a coleta de dados.       
         List<Disco> listadisco = grupoDeDiscos.getDiscos();
         for (Disco disco : listadisco) {
             bytesEscritos += disco.getBytesDeEscritas();
