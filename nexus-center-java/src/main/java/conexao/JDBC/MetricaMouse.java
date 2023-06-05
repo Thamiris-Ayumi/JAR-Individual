@@ -14,9 +14,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamris
+ * @author thami
  */
-
+// Tabela MetricaMouse
 public class MetricaMouse {
 
     private POINT posicaoAtual;
@@ -24,6 +24,7 @@ public class MetricaMouse {
     private Integer idMetricaMouse;
     private Integer cordenadaX;
     private Integer cordenaday;
+    private Integer acaoClick;
     private String dataHora;
     private String status;
     private Integer fkMaquina;
@@ -62,7 +63,8 @@ public class MetricaMouse {
         JdbcTemplate conection = new Conexao().getConnection();
         return conection;
     }
-        public JdbcTemplate conectMouseazu() {
+
+    public JdbcTemplate conectMouseazu() {
         JdbcTemplate conection2 = new Conexao().getConnectionAzu();
         return conection2;
     }
@@ -81,6 +83,7 @@ public class MetricaMouse {
         currenty = posicaoAtual.y;
         if (currentx.equals(lastx) && currenty.equals(lasty)) {
             movimento = "Inativo";
+
         } else {
             movimento = "Ativo";
         }
@@ -93,7 +96,6 @@ public class MetricaMouse {
                 fkMaquina,
                 fkEmpresa.toString());
         this.conectMouseazu().update("insert into MetricaMouse(cordenadaX,cordenadaY,dataHora,statusMouse,fkMaquina,fkEmpresa) values(?,?,?,?,?,?)",
-
                 coordenadas.cordenadaX,
                 coordenadas.cordenaday,
                 coordenadas.dataHora,
@@ -102,6 +104,16 @@ public class MetricaMouse {
                 fkEmpresa.toString());
         lastx = currentx;
         lasty = currenty;
+//        this.conectMouseazu().update("insert into MetricaMouse values(?,?,?,?,?,?,?)",
+//                coordenadas.idMetricaMouse,
+//                coordenadas.cordenadaX,
+//                coordenadas.cordenaday,
+//                coordenadas.dataHora,
+//                movimento,
+//                fkMaquina,
+//                fkEmpresa);
+//        lastx = currentx;
+//        lasty = currenty;
     }
 
     public WinDef.POINT getPosicaoAtual() {
@@ -224,6 +236,21 @@ public class MetricaMouse {
         this.fkEmpresa = fkEmpresa;
     }
 
+//     @Override
+//    public String toString() {
+//        return String.format(" idMetricaMouse: %d |"
+//                + " cordenadaX: %d | cordenaday : %d| acaoClick: %d |"
+//                + " dataHora: %s | status: %s | fkMaquina: %d | fkEmpresa: %ds",
+//                 idMetricaMouse, cordenadaX, cordenaday,
+//                acaoClick, dataHora, status, fkMaquina, fkEmpresa);
+//    }
+//    @Override
+//    public String toString() {
+//        return String.format(" idMetricaMouse: %d |"
+//                + " cordenadaX: %d | cordenaday : %d| "
+//                + " dataHora: %s | status: %s | fkMaquina: %d | fkEmpresa: %ds",
+//                idMetricaMouse, cordenadaX, cordenaday, dataHora, status, fkCasa);
+//    }
     @Override
     public String toString() {
         return "MetricaMouse{" + "posicaoAtual=" + posicaoAtual + ", formatter=" + formatter + ", idMetricaMouse=" + idMetricaMouse + ", cordenadaX=" + cordenadaX + ", cordenaday=" + cordenaday + ", dataHora=" + dataHora + ", status=" + status + ", fkMetrica=" + fkMaquina + ", currentx=" + currentx + ", currenty=" + currenty + ", lastx=" + lastx + ", lasty=" + lasty + ", movimento=" + movimento + ", coordenadas=" + coordenadas + '}';

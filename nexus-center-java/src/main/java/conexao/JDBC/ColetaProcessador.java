@@ -6,6 +6,7 @@ package conexao.JDBC;
 
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.slack.api.methods.SlackApiException;
+import comunicacao.slack.SlackeandoMetodos;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,10 +14,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author rafae
+ * @author thami
  */
 public class ColetaProcessador {
 
+    private SlackeandoMetodos mensagem;
     private DateTimeFormatter formatter;
     private Integer idMetrica;
     private Double capacidade;
@@ -57,6 +59,7 @@ public class ColetaProcessador {
 
     public void enviaDadosProcessador(Integer fkMaquina, Integer fkEmpresa) throws SlackApiException, IOException {
         ColetaProcessador coleta = new ColetaProcessador();
+        mensagem = new SlackeandoMetodos();
 
         // Alertas aqui
         // Envio de dados aqui         
@@ -83,6 +86,7 @@ public class ColetaProcessador {
             statusAlerta = "Atencao";
         } else if (porcentagem >= 90 && porcentagem < 100) {
             statusAlerta = "Alerta";
+            mensagem.notificarErroProcessador(porcentagem);
         }
         this.conectHd().update("insert into AlertaDashboard values(?,?,?,?,?)",
                 idAlerta = null,

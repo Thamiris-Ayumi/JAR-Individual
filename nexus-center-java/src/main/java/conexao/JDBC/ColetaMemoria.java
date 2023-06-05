@@ -6,6 +6,7 @@ package conexao.JDBC;
 
 import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.slack.api.methods.SlackApiException;
+import comunicacao.slack.SlackeandoMetodos;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,9 +14,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class ColetaMemoria {
+    private SlackeandoMetodos mensagem;
     private DateTimeFormatter formatter;
     private Integer idMetrica;
     private Double capacidade;
@@ -38,7 +40,7 @@ public class ColetaMemoria {
         this.unidadeMedida = "GB";
         this.tipoComponente = "Memória";
         this.dataHora = LocalDateTime.now().format(formatter);
-        this.modeloComponente = "Unknow";
+        this.modeloComponente = "Unknown";
     }
 
     public JdbcTemplate conectmem() {
@@ -53,6 +55,7 @@ public class ColetaMemoria {
 
     public void enviaDadosMem(Integer fkMaquina, Integer fkEmpresa) throws SlackApiException, IOException {
         ColetaMemoria coleta = new ColetaMemoria();
+        mensagem= new SlackeandoMetodos();
 
         this.conectmem().update("insert into Metrica values(?,?,?,?,?,?,?)",
                 coleta.idMetrica = null,
@@ -77,6 +80,7 @@ public class ColetaMemoria {
             statusAlerta = "Atencao";
         } else if (porcentagem >= 90 && porcentagem < 100) {
             statusAlerta = "Alerta";
+            mensagem.notificarErroMem(porcentagem);
         }
         this.conectmem().update("insert into AlertaDashboard values(?,?,?,?,?)",
                 idAlerta = null,
@@ -94,6 +98,8 @@ public class ColetaMemoria {
     
     public void enviaDadosMemazu(Integer fkMaquina, Integer fkEmpresa) {
         ColetaMemoria coleta = new ColetaMemoria();
+
+
     }
 
 //  Para enviar à entidade Configuração Componente:

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class Mouse {
 
@@ -25,7 +25,6 @@ public class Mouse {
     private Boolean movimento;
 
     public POINT getMousePosition() {
-
         POINT point = new POINT();
         User32.INSTANCE.GetCursorPos(point);
 

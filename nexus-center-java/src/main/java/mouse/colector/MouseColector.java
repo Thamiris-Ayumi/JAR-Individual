@@ -6,15 +6,15 @@ package mouse.colector;
 
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.POINT;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class MouseColector {
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private POINT lastMousePosition;
     private long lastActivityTime;
@@ -28,27 +28,28 @@ public class MouseColector {
 
     public MouseColector(long timeout) {
         this.timeout = timeout;
+//        lastMousePosition = getMousePosition();
         lastActivityTime = System.currentTimeMillis();
     }
 
     public MouseColector() {
     }
-    
+
     public POINT getMousePosition() {
-        POINT point = new POINT();        
+        POINT point = new POINT();
+
+
         User32.INSTANCE.GetCursorPos(point);
         return point;
     }
-    
 
     public void showMouseposition() {
         POINT currentMousePosition = getMousePosition();
         currentx = currentMousePosition.x;
         currenty = currentMousePosition.y;
-        
-        if (currentx.equals(lastx)&&currenty.equals(lasty)){
+        if (currentx.equals(lastx) && currenty.equals(lasty)) {
             movimento = false;
-        }else{
+        } else {
             movimento = true;
         }
 
@@ -57,15 +58,15 @@ public class MouseColector {
         lasty = currenty;
         lastActivityTime = System.currentTimeMillis();
         lastCurrrentTime = LocalDateTime.now().format(formatter);
-       
+
         System.out.println("Movimentos do Mouse \n coord x:" + currentx + "\n coord y:" + currenty + " \n Horário : " + lastCurrrentTime);
     }
 
     public String isPositionStoped() {
         if (movimento) {
-            return "Ativo";
-        }else{
-            return "Inativo";
+            return "ativo";
+        } else {
+            return "desativado";
         }
 
     }

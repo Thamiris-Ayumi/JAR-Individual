@@ -1,15 +1,13 @@
 conexao\JDBC\ColetaProcessador.class
 login\UsuarioDAO.class
-login\LoginConsole.class
 conexao\JDBC\Parametro.class
 mouse\colector\MouseColector.class
 conexao\JDBC\ColetaMemoria.class
-login\LogTeste.class
+comunicacao\slack\NotifSlack.class
 conexao\JDBC\Empresa.class
 conexao\JDBC\MetricaMouseRowMapper.class
 conexao\JDBC\Usb.class
 conexao\JDBC\RegistroAtividade.class
-looca\Coletor.class
 mouse\colector\MouseMain.class
 conexao\JDBC\ColetaHDInfo.class
 mouse\colector\Mouse.class

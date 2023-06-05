@@ -6,9 +6,10 @@ package conexao.JDBC;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class Metrica {
+
     private Integer idMetrica;
     private Double valorUtlizado;
     private String unidadeMedida;
@@ -68,7 +69,5 @@ public class Metrica {
     public String toString() {
         return "Metrica{" + "idMetrica=" + idMetrica + ", valorUtlizado=" + valorUtlizado + ", unidadeMedida=" + unidadeMedida + ", dataHora=" + dataHora + ", fkMaquina=" + fkMaquina + ", fkEmpresa=" + fkEmpresa + '}';
     }
-    
-    
-    
+
 }

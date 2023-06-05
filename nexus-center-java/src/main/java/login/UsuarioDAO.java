@@ -4,6 +4,7 @@
  */
 package login;
 
+import comunicacao.slack.NotifSlack;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,10 +15,9 @@ import conexao.JDBC.Maquina;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
-
-//(DAO) Data Access Object - Acesso ao banco de dados
+// Classe (DAO) Data Access Object - Acesso ao banco de dados
 public class UsuarioDAO {
 
     Connection con;
@@ -43,7 +43,29 @@ public class UsuarioDAO {
             JOptionPane.showMessageDialog(null, "UsuarioDAO:" + erro);
             return null;
         }
-       }
-
     }
-   
+
+    // Retorna Código Slack
+    public String coletarCodigoSlack() {
+        con = new Conexao().conectaBDAzure();
+        NotifSlack slack = new NotifSlack();
+
+        String sql = "select*from Slack";
+        try {
+            PreparedStatement pstm = con.prepareStatement(sql);
+
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+
+                slack.setCodigo(rs.getString("codigo"));
+
+                // Preencha as outras propriedades de Maquina aqui
+                return rs.getString("codigo");
+            } else {
+                return null; // Não encontrou a máquina com o ID fornecido
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+}

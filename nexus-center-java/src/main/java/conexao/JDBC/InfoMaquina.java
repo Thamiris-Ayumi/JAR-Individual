@@ -6,9 +6,9 @@ package conexao.JDBC;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
-
+// Tabela InfoMaquina
 public class InfoMaquina {
 
     private String sistemaOperacional;
@@ -91,7 +91,7 @@ public class InfoMaquina {
     public String toString() {
         return String.format(" sistemaOperacional: %s |"
                 + " fabricante: %s | arquitetura : %s| nomeProcessador: %s |"
-                + " capacidadeRam: %s | capacidadeDisco: %s | fkEmpresa: %d | fkMaquina: %d",
+                + " capacidadeRam: %s | capacidadeDisco: %s | fkEmpresa: %d | fkMaquina: %ds",
                 sistemaOperacional, fabricante, arquitetura,
                 nomeProcessador, capacidadeRam, capacidadeDisco, fkEmpresa, fkMaquina);
     }

@@ -6,9 +6,9 @@ package conexao.JDBC;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
-
+// Tabela RegistroAtividade
 public class Usb {
 
     private Integer idUsb;
@@ -16,7 +16,7 @@ public class Usb {
     private String fornecedor;
     private Integer fkMaquina;
     private Integer fkEmpresa;
-    
+
     public Integer getIdUsb() {
         return idUsb;
     }

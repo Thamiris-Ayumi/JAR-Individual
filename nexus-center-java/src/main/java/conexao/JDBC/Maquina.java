@@ -3,11 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package conexao.JDBC;
-/**
- *
- * @author thamiris
- */
 
+// Tabela Maquina
 public class Maquina {
 
     private Integer idMaquina;
@@ -28,8 +25,8 @@ public class Maquina {
         this.senha = senha;
         this.fkEmpresa = fkEmpresa;
     }
-    
-    //Construtor alternativo para execução de testes
+//Construtor alternativo para execução de testes
+
     public Maquina(String patrimonio, String senha) {
         this.patrimonio = patrimonio;
         this.senha = senha;
@@ -119,14 +116,10 @@ public class Maquina {
     }
 
     @Override
-   public String toString() {
+    public String toString() {
         return String.format("\nMÁQUINA | idMáquina: %d | Nome Usuário: %s | Patrimônio: %s | Senha : %s| fkEmpresa: %d |"
                 + "\n EMPRESA | idEmpresa : %d | Razão Social: %s| CNPJ: %s | Email: %s | Telefone: %s |\n", idMaquina, nomeUsuario, patrimonio, senha,
                 fkEmpresa, idEmpresa, razaoSocial, CNPJ,email,tel);
     }
 
-    
-    
-    
-    
 }

@@ -8,7 +8,6 @@ import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.dispositivos.DispositivoUsb;
 import com.github.britooo.looca.api.group.dispositivos.DispositivosUsbGrupo;
-import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import conexao.JDBC.Componente;
@@ -17,30 +16,28 @@ import conexao.JDBC.ConfiguracaoComponente;
 import conexao.JDBC.Empresa;
 import conexao.JDBC.EnviaDados;
 import conexao.JDBC.InfoMaquina;
+import java.sql.ResultSet;
 import conexao.JDBC.Maquina;
-import conexao.JDBC.Metrica;
-import conexao.JDBC.MetricaMouse;
 import conexao.JDBC.RegistroAtividade;
 import conexao.JDBC.Usb;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import java.util.Scanner;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamris
+ * @author thami
  */
 public class LoginConsole {
 
     public static void main(String[] args) {
+
+        // Validação Log
         Scanner leitor01 = new Scanner(System.in);
         System.out.println(""
                 + "       ___  ___\n"
@@ -56,61 +53,48 @@ public class LoginConsole {
                 + " *    \\____/\\____||_|\\__|\\____|\\____||_|\\_\\   *\n");
 
         System.out.println("Digite o patrimônio da sua máquina:");
-        String patrimonio_digitado = leitor01.nextLine();
+        String patrimonioDigitado = leitor01.nextLine();
 
         System.out.println("Digite a senha:");
-        String senha_digitada = leitor01.nextLine();
+        String senhaDigitada = leitor01.nextLine();
 
-        //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        // Validação Log
-        Maquina validMaquina = new Maquina(patrimonio_digitado, senha_digitada);// Adicionado Construtor na classe máquina]
+        Maquina validMaquina = new Maquina(patrimonioDigitado, senhaDigitada);// Adicionado Construtor na classe máquina]
         UsuarioDAO validacaoLog = new UsuarioDAO();// Executa-se a consulta ao banco referente ao método para instanciar objeto Maquina que servirá ara autenticação;
-
         ResultSet rsusariodaos = validacaoLog.autenticsacaoUsuario(validMaquina);// Nesta linha é instanciado objeto com parâmetros provenientes da consulta com a Azure
-        LogTeste log = new LogTeste();
+        Log log = new Log();
 
         try {
             log.login(rsusariodaos, rsusariodaos.next());
         } catch (SQLException ex) {
-            System.out.println("Erro");
+            Logger.getLogger(LoginConsole.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //--------------------------------------------------------------------------------------------------------
         try {
+
             // Objetos JDBC
             Conexao conexao = new Conexao();
             JdbcTemplate conMysql = conexao.getConnection();
             JdbcTemplate conAzure = conexao.getConnectionAzu();
 
             // Objetos Entidades
-            InfoMaquina infoMaquina = new InfoMaquina();
-            RegistroAtividade registroAtividade = new RegistroAtividade();
             Usb usb = new Usb();
             Componente componente = new Componente();
             ConfiguracaoComponente configComponente = new ConfiguracaoComponente();
-            Metrica metrica = new Metrica();
-            MetricaMouse metricaMouse = new MetricaMouse();
 
             // Objetos  Looca
             Looca looca = new Looca();
             Sistema sistema = looca.getSistema();
-            Memoria memoria = looca.getMemoria();
             DiscoGrupo grupoDeDiscos = looca.getGrupoDeDiscos();
             Processador processador = looca.getProcessador();
 
-            // Retorno dos dados de patrimônio e senha
-            String patrimonio_maquina = patrimonio_digitado;
-
-            String senha_maquina = senha_digitada;
-
-            Maquina maquina = new Maquina(patrimonio_maquina, senha_maquina);// Adicionado Construtor na classe máquina
+            // Objetos Máquina
+            Maquina maquina = new Maquina(patrimonioDigitado, senhaDigitada);// Adicionado Construtor na classe máquina
 
             UsuarioDAO objUsuarioDAO = new UsuarioDAO();// Executa-se a consulta ao banco referente ao método para instanciar objeto Maquina que servirá ara autenticação;
             ResultSet rsusariodao = objUsuarioDAO.autenticsacaoUsuario(maquina);// Nesta linha é instanciado objeto com parâmetros provenientes da consulta com a Azure
 
             if (rsusariodao.next()) {
-                // LOGIN REALIZADO
-                System.out.println("Login realizado!\nEnviando dados da máquina:");
+                //LOGIN REALIZADO
+                System.out.println("Login realizado!");
 
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 //Setando Atributos
@@ -138,7 +122,8 @@ public class LoginConsole {
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Insert tabela Empresa
                 List<Empresa> listadeEmpresa = conMysql.query("select * from Empresa where idEmpresa = ?",
-                        new BeanPropertyRowMapper(Empresa.class), rsusariodao.getInt("idEmpresa"));// informações extraídas da consulta sqlserver realizadas em usuario DAO, preenchendo o bean property  com um construtor vazio disponível para receber o objeto específico do servidor.
+                        new BeanPropertyRowMapper(Empresa.class
+                        ), rsusariodao.getInt("idEmpresa"));// informações extraídas da consulta sqlserver realizadas em usuario DAO, preenchendo o bean property  com um construtor vazio disponível para receber o objeto específico do servidor.
                 if (listadeEmpresa.isEmpty()) {
                     // Inset tabela Empresa
                     conMysql.update("INSERT INTO Empresa (idEmpresa, razaoSocial, CNPJ, email, tel) VALUES (?,?,?,?,?)",
@@ -147,12 +132,14 @@ public class LoginConsole {
                             maquina.getCNPJ(),
                             maquina.getEmail(),
                             maquina.getTel());
+
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Insert tabela Maquina
                 List<Maquina> listaDeMaquina1 = conMysql.query("select * from Maquina where idMaquina = ?",
-                        new BeanPropertyRowMapper(Maquina.class), rsusariodao.getInt("idMaquina"));
+                        new BeanPropertyRowMapper(Maquina.class
+                        ), rsusariodao.getInt("idMaquina"));
                 if (listaDeMaquina1.isEmpty()) {
 
                     // Inset tabela Maquina
@@ -162,12 +149,14 @@ public class LoginConsole {
                             maquina.getPatrimonio(),
                             maquina.getSenha(),
                             maquina.getFkEmpresa());
+
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Insert tabela InfoMaquina Local
                 List<Maquina> listaDeMaquina = conMysql.query("select * from InfoMaquina where fkMaquina = ?",
-                        new BeanPropertyRowMapper(Maquina.class), rsusariodao.getInt("idMaquina"));
+                        new BeanPropertyRowMapper(Maquina.class
+                        ), rsusariodao.getInt("idMaquina"));
                 if (listaDeMaquina.isEmpty()) {
                     conMysql.update("insert into InfoMaquina (sistemaoperacional, fabricante, arquitetura, nomeProcessador, capacidadeRam, capacidadeDisco, fkmaquina, fkempresa) values (?,?,?,?,?,?,?,?)",
                             sistema.getSistemaOperacional(),
@@ -192,7 +181,8 @@ public class LoginConsole {
 
                 // Insert tabela InfoMaquina Azure
                 List<Maquina> listaDeMaquinaAzure = conAzure.query("select * from InfoMaquina where fkMaquina = ?",
-                        new BeanPropertyRowMapper(Maquina.class), rsusariodao.getInt("idMaquina"));
+                        new BeanPropertyRowMapper(Maquina.class
+                        ), rsusariodao.getInt("idMaquina"));
                 if (listaDeMaquinaAzure.isEmpty()) {
                     conAzure.update("insert into InfoMaquina (sistemaoperacional, fabricante, arquitetura, nomeProcessador, capacidadeRam, capacidadeDisco, fkmaquina, fkempresa) values (?,?,?,?,?,?,?,?)",
                             sistema.getSistemaOperacional(),
@@ -218,7 +208,6 @@ public class LoginConsole {
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Insert Tabela Usb
                 LocalDateTime dataHoraAcesso = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
                 DispositivosUsbGrupo dispositivos = looca.getDispositivosUsbGrupo();
 
@@ -256,40 +245,7 @@ public class LoginConsole {
                         maquina.getIdMaquina(),
                         dataHoraAcesso
                 );
-                //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                // Insert Tabela Componente
-                List<Componente> ListaComponente = conMysql.query("select*From Componente  join ConfiguracaoComponente on fkComponente = idComponente where fkMaquina = ?",
-                        new BeanPropertyRowMapper(Maquina.class), rsusariodao.getInt("idMaquina"));
-                if (ListaComponente.isEmpty()) {
-                    //set 1
-                    componente.setTipoCompenente("Disco");
-                    componente.setIdComponente(1);
 
-                    conMysql.update("insert into Componente(idComponente, tipoComponente) values (?,?)",
-                            componente.getIdComponente(),
-                            componente.getTipoCompenente()
-                    );
-
-                    //set 2
-                    componente.setIdComponente(2);
-                    componente.setTipoCompenente("Processador");
-
-                    conMysql.update("insert into Componente(idComponente, tipoComponente) values (?,?)",
-                            componente.getIdComponente(),
-                            componente.getTipoCompenente()
-                    );
-
-                    //set 3
-                    componente.setIdComponente(3);
-                    componente.setTipoCompenente("Memoria");
-
-                    conMysql.update("insert into Componente(idComponente, tipoComponente) values (?,?)",
-                            componente.getIdComponente(),
-                            componente.getTipoCompenente()
-                    );
-                }
-
-                //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Insert Tabela ConfiguracaoComponente 
                 //set CPU
                 componente.setIdComponente(1);
@@ -356,32 +312,37 @@ public class LoginConsole {
                         configComponente.getUnidadeMedida()
                 );
 
+                //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 // Selects com Resultados
                 // Tabela Maquina
                 List< RegistroAtividade> registroAtividades = conMysql.query("select * from RegistroAtividade order by idRegistroUsuario asc",
-                        new BeanPropertyRowMapper(RegistroAtividade.class));
+                        new BeanPropertyRowMapper(RegistroAtividade.class
+                        ));
                 System.out.println(registroAtividades);
 
                 // Tabela InfoMaquina
                 List< InfoMaquina> infoMaquinas = conMysql.query("select * from InfoMaquina order by idInfoMaquina asc",
-                        new BeanPropertyRowMapper(InfoMaquina.class));
+                        new BeanPropertyRowMapper(InfoMaquina.class
+                        ));
                 System.out.println(infoMaquinas);
 
                 //Tabela Maquina e Empresa
                 List<Maquina> maquinas = conMysql.query("select * from Maquina join Empresa on fkempresa=idempresa order by idMaquina asc",
-                        new BeanPropertyRowMapper(Maquina.class));
+                        new BeanPropertyRowMapper(Maquina.class
+                        ));
                 System.out.println(maquinas);
 
+//                aviso.notificar();
                 EnviaDados inicio = new EnviaDados();
                 inicio.iniciarEnvio(maquina.getIdMaquina(), maquina.getFkEmpresa());
 
             } else {
                 // ERRO NO LOGIN
-                System.out.println("Erro ao realizar login!");
+                System.out.println("Erro ao realizar login");
             }
 
         } catch (Exception erro) {
-            System.out.println("Erro ao enviar dados para o banco");
+            System.out.println("Erro ao enviar dados para o banco de dados!");
         }
     }
 }

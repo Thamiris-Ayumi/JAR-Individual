@@ -6,7 +6,7 @@ package conexao.JDBC;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class Componente {
     private Integer idComponente;
@@ -35,9 +35,5 @@ public class Componente {
     public String toString() {
         return "Componente{" + "idComponente=" + idComponente + ", tipoCompenente=" + tipoCompenente + '}';
     }
-
  
-
-  
-    
 }

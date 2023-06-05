@@ -4,27 +4,26 @@
  */
 package conexao.JDBC;
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
+
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class MaquinaRowMapper implements RowMapper<Maquina> {
-    
+
     @Override
     public Maquina mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Maquina maquina= new Maquina();
+        Maquina maquina = new Maquina();
         maquina.setIdMaquina(rs.getInt("idMaquina"));
         maquina.setNomeUsuario(rs.getString("nomeDoUsuario"));
         maquina.setPatrimonio(rs.getString("patrimonio"));
         maquina.setSenha(rs.getString("senha"));
         maquina.setFkEmpresa(rs.getInt("fkEmpresa"));
         return maquina;
-    
-}
-        
-    
+
+    }
+
 }

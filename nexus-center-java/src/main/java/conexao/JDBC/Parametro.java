@@ -5,22 +5,28 @@
 package conexao.JDBC;
 
 import java.util.List;
+import java.util.Map;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class Parametro {
 
     private Integer idParametroAlerta;
-    private Double alertaDecimal;
-    private String inidadeMedida;
+    private Integer fkComponente;
+    private Integer ideal;
+    private Integer atencao;
+    private Integer alerta;
 
-    public Parametro(Integer idParametroAlerta, Double alertaDecimal, String inidadeMedida) {
+    public Parametro(Integer idParametroAlerta, Integer fkComponente, Integer ideal, Integer atencao, Integer alerta) {
         this.idParametroAlerta = idParametroAlerta;
-        this.alertaDecimal = alertaDecimal;
-        this.inidadeMedida = inidadeMedida;
+        this.fkComponente = fkComponente;
+        this.ideal = ideal;
+        this.atencao = atencao;
+        this.alerta = alerta;
     }
 
     public Parametro() {
@@ -37,18 +43,31 @@ public class Parametro {
 
         return conectnuv;
     }
+
     public List<Parametro> listarTodos() {
         List<Parametro> todosParam = this.conectloc().query("select * from ParametroAlerta;",
                 new ParametroRowMapper());
         return todosParam;
     }
-    public Integer tamanhoTotalParam(){
-        Integer tamanho=this.listarTodos().size();
+
+    public Map<String, Object> recuperarpornumero(Integer fkMaquina) {
+        try {
+            Map<String, Object> registro = this.conectnuv().queryForMap(
+                    "select * from ParametroAlerta where idParametroAlerta = ?", fkMaquina);
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public Integer tamanhoTotalParam() {
+        Integer tamanho = this.listarTodos().size();
         return tamanho;
     }
-    public Parametro ultimoparametro(){
-        Parametro ultimo= this.conectloc().queryForObject("select * from ParametroAlerta where tipo=?,?", 
-                new ParametroRowMapper(),"usuario","senha");
+
+    public Parametro parametroDaUltimafk(Integer fkComponente) {
+        Parametro ultimo = this.conectnuv().queryForObject("select * from ParametroAlerta where fkComponente=?",
+                new ParametroRowMapper(), fkComponente);
         return ultimo;
     }
 
@@ -60,20 +79,36 @@ public class Parametro {
         this.idParametroAlerta = idParametroAlerta;
     }
 
-    public Double getAlertaDecimal() {
-        return alertaDecimal;
+    public Integer getFkComponente() {
+        return fkComponente;
     }
 
-    public void setAlertaDecimal(Double alertaDecimal) {
-        this.alertaDecimal = alertaDecimal;
+    public void setFkComponente(Integer fkComponente) {
+        this.fkComponente = fkComponente;
     }
 
-    public String getInidadeMedida() {
-        return inidadeMedida;
+    public Integer getIdeal() {
+        return ideal;
     }
 
-    public void setInidadeMedida(String inidadeMedida) {
-        this.inidadeMedida = inidadeMedida;
+    public void setIdeal(Integer ideal) {
+        this.ideal = ideal;
+    }
+
+    public Integer getAtencao() {
+        return atencao;
+    }
+
+    public void setAtencao(Integer atencao) {
+        this.atencao = atencao;
+    }
+
+    public Integer getAlerta() {
+        return alerta;
+    }
+
+    public void setAlerta(Integer alerta) {
+        this.alerta = alerta;
     }
 
 }

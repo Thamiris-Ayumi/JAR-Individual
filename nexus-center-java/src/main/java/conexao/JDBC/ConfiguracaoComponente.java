@@ -6,7 +6,7 @@ package conexao.JDBC;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class ConfiguracaoComponente {
 
@@ -61,5 +61,4 @@ public class ConfiguracaoComponente {
         return "ConfiguracaoComponente{" + "fkMaquina=" + fkMaquina + ", fkEmpresa=" + fkEmpresa + ", fkComponente=" + fkComponente + ", capacidade=" + capacidade + ", unidadeMedida=" + unidadeMedida + '}';
     }
 
- 
 }

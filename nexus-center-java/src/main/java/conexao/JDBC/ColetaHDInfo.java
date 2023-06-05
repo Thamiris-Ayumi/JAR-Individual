@@ -9,6 +9,7 @@ import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.discos.Volume;
 import com.slack.api.methods.SlackApiException;
+import comunicacao.slack.SlackeandoMetodos;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,10 +18,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author thamiris
+ * @author thami
  */
 public class ColetaHDInfo {
 
+    private SlackeandoMetodos mensagem;
     private DateTimeFormatter formatter;
     private Integer idMetrica;
     private Double capacidade;
@@ -89,6 +91,7 @@ public class ColetaHDInfo {
 
     public void enviaDadosTotalhd(Integer fkMaquina, Integer fkEmpresa) throws SlackApiException, IOException {
         ColetaHDInfo coleta = new ColetaHDInfo();
+        mensagem = new SlackeandoMetodos();
 
         this.conectHd().update("insert into Metrica values(?,?,?,?,?,?,?)",
                 coleta.idMetrica = null,
@@ -112,6 +115,7 @@ public class ColetaHDInfo {
             statusAlerta = "Atencao";
         } else if (porcentagem >= 90 && porcentagem < 100) {
             statusAlerta = "Alerta";
+            mensagem.notificarErroHd(porcentagem);
         }
         this.conectHd().update("insert into AlertaDashboard values(?,?,?,?,?)",
                 idAlerta = null,
@@ -139,8 +143,7 @@ public class ColetaHDInfo {
         grupoDeDiscos = looca.getGrupoDeDiscos();
         bytesEscritos = 0.0;
         capacidadeocupada = 0.0;
-        dataHora = LocalDateTime.now().format(formatter);
-//      Foi nescessário criar duas listas para prosseguir com a coleta de dados.       
+        dataHora = LocalDateTime.now().format(formatter);       
         List<Disco> listadisco = grupoDeDiscos.getDiscos();
         for (Disco disco : listadisco) {
             bytesEscritos += disco.getBytesDeEscritas();

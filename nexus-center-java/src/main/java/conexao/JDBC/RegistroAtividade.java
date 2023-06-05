@@ -4,13 +4,11 @@
  */
 package conexao.JDBC;
 
-import java.time.Instant;
-
 /**
  *
- * @author thamiris
+ * @author thami
  */
-
+// Tabela RegistroAtividade
 public class RegistroAtividade {
 
     private Integer idRegistroUsuario;
